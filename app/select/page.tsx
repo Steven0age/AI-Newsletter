@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 export default function SelectPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -11,8 +11,6 @@ export default function SelectPage() {
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
-
-  const handleSavePreferences = () => {};
 
   const handleCategoryToggle = (categoryId: string) => {
     setSelectedCategories((prev) =>
@@ -66,6 +64,41 @@ export default function SelectPage() {
     },
   ];
 
+  async function handleSavePreferences(e: FormEvent) {
+    e.preventDefault();
+    if (selectedCategories.length === 0) {
+      alert("Please select at least one category");
+      return;
+    }
+
+    if (!user) {
+      alert("Please sign in to continue");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/user-preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          categories: selectedCategories,
+          frequency: selectedFrequency,
+          email: user.email,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save preferences");
+      }
+
+      alert(
+        "Your newsletter preferences have been saved! You will start receiving them soon",
+      );
+      router.push("/dashboard");
+    } catch (error) {
+      alert("Failed to save preferences. Please try again");
+    }
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
