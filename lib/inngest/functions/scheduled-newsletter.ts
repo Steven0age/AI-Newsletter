@@ -2,7 +2,7 @@ import { fetchArticles } from "@/lib/news";
 import { inngest } from "../client";
 
 export default inngest.createFunction(
-  { id: "newsletter/scheduled", triggers: [{ event: "newsletter.schedule" }] },
+  { id: "newsletter/scheduled", triggers: { event: "newsletter.schedule" } },
   async ({ event, step, runId }) => {
     // Fetch artilcles per category
     const categories = ["technology", "business", "politics"];
@@ -52,5 +52,6 @@ Make it email-friendly with clear sections and engaging subject lines.`,
     });
 
     console.log("summary =", summary.choices[0].message.content);
+    return {};
   },
 );

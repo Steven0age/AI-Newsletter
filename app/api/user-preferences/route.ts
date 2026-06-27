@@ -1,3 +1,4 @@
+import { inngest } from "@/lib/inngest/client";
 import { createClient } from "@/lib/server";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -44,10 +45,15 @@ export async function POST(request: NextRequest) {
   if (upsertError) {
     console.error("Error saving preferences: ", upsertError);
     return NextResponse.json(
-      { error: "Failed to sabe preferences" },
+      { error: "Failed to save preferences" },
       { status: 500 },
     );
   }
+
+  await inngest.send({
+    name: "newsletter.schedule",
+    data: {},
+  });
 
   return NextResponse.json({
     success: true,
