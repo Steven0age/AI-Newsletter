@@ -10,13 +10,13 @@ export async function fetchArticles(
       );
 
       if (!response.ok) {
-        console.error("Failed to fetch articles for this category", category);
+        console.error("Failed to fetch articles for this category ", category);
         return [];
       }
 
       const data = await response.json();
       return data.articles.slice(0, 5).map((article: any) => ({
-        title: article.titl || "No tittle",
+        title: article.title || "No tittle",
         url: article.url || "#",
         description: article.description || "No description available",
       }));

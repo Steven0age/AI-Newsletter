@@ -52,7 +52,10 @@ export async function POST(request: NextRequest) {
 
   await inngest.send({
     name: "newsletter.schedule",
-    data: {},
+    data: {
+      categories,
+      email,
+    },
   });
 
   return NextResponse.json({
