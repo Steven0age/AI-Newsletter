@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface UserPreferences {
   categories: string[];
@@ -15,6 +15,42 @@ export default function DashboardPage() {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    fetchPreferences();
+
+    async function fetchPreferences() {
+      const response = await fetch("/api/user-preferences");
+      const data = await response.json();
+      setPreferences(data);
+    }
+  }, []);
+
+  async function handleDeactivateNewsletter() {
+    console.log("function handleDeactivateNewsletter started");
+    const response = await fetch("/api/user-preferences", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: false }),
+    });
+
+    if (response.ok) {
+      setPreferences((prev) => (prev ? { ...prev, is_active: false } : null));
+    }
+  }
+
+  async function handleActivateNewsletter() {
+    const response = await fetch("/api/user-preferences", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: true }),
+    });
+
+    if (response.ok) {
+      setPreferences((prev) => (prev ? { ...prev, is_active: true } : null));
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -41,9 +77,9 @@ export default function DashboardPage() {
                     Categories
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {preferences.categories.map((category) => (
+                    {preferences.categories.map((category, key) => (
                       <span
-                        key={category}
+                        key={key}
                         className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
                       >
                         {category}
@@ -139,7 +175,7 @@ export default function DashboardPage() {
                 <>
                   {preferences.is_active ? (
                     <button
-                      onClick={() => {}}
+                      onClick={handleDeactivateNewsletter}
                       className="w-full flex items-center justify-center px-4 py-3 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
                     >
                       <svg
@@ -159,7 +195,7 @@ export default function DashboardPage() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => {}}
+                      onClick={handleActivateNewsletter}
                       className="w-full flex items-center justify-center px-4 py-3 border border-green-300 text-sm font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
                     >
                       <svg
