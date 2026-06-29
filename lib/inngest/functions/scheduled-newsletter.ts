@@ -118,13 +118,15 @@ export default inngest.createFunction(
 
       nextScheduleTime.setHours(9, 0, 0, 0);
 
+      console.log("LOG: EVENT =", event);
+
       await inngest.send({
         name: "newsletter.schedule",
         data: {
           categories,
           email: event.data.email,
           frequency: event.data.frequency,
-          userId: event.data.user_id,
+          userId: event.data.userId,
         },
         ts: nextScheduleTime.getTime(),
       });

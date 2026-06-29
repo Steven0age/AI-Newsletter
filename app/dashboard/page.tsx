@@ -27,7 +27,6 @@ export default function DashboardPage() {
   }, []);
 
   async function handleDeactivateNewsletter() {
-    console.log("function handleDeactivateNewsletter started");
     const response = await fetch("/api/user-preferences", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
