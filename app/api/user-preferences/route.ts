@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
     data: {
       categories,
       email,
+      frequency,
     },
   });
 
@@ -128,6 +129,9 @@ export async function PATCH(request: NextRequest) {
         { error: "Failed to update preferences" },
         { status: 500 },
       );
+    }
+
+    if (!is_active) {
     }
 
     return NextResponse.json({ success: true });
