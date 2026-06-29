@@ -60,7 +60,7 @@ export async function updateSession(request: NextRequest) {
 
   if (request.nextUrl.pathname === "/dashboard" && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/signin";
     return NextResponse.redirect(url);
   }
   return supabaseResponse;

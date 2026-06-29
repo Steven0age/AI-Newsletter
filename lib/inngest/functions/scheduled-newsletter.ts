@@ -2,17 +2,25 @@ import { fetchArticles } from "@/lib/news";
 import { inngest } from "../client";
 import { marked } from "marked";
 import { sendEmail } from "@/lib/email";
-import { createClient } from "@/lib/server";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/admin";
 
 export default inngest.createFunction(
-  { id: "newsletter/scheduled", triggers: { event: "newsletter.schedule" } },
+  {
+    id: "newsletter/scheduled",
+    cancelOn: [
+      {
+        event: "newsletter.schedule.deleted",
+        if: "async.data.userId == event.data.userId",
+      },
+    ],
+    triggers: { event: "newsletter.schedule" },
+  },
   async ({ event, step, runId }) => {
     const isUserActive = await step.run("check-user-status", async () => {
-      const cookieStore = await cookies();
-      const supabase = await createClient(cookieStore);
+      const supabase = await createClient();
+
       const { data, error } = await supabase
-        .from("user_prefernces")
+        .from("user_preferences")
         .select("is_active")
         .eq("user_id", event.data.userId)
         .single();
@@ -116,6 +124,7 @@ export default inngest.createFunction(
           categories,
           email: event.data.email,
           frequency: event.data.frequency,
+          userId: event.data.user_id,
         },
         ts: nextScheduleTime.getTime(),
       });
